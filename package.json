@@ -1,0 +1,37 @@
+{
+  "name": "redisseach",
+  "version": "1.0.0",
+  "description": "ts lib for redis-search",
+  "main": "index.js",
+  "scripts": {
+    "pretest": "tsc -p .",
+    "test": "nyc mocha -r ts-node/register src/**/*.test.ts",
+    "posttest": "nyc report --reporter=json",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khalilmansouri/redisseach.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/khalilmansouri/redisseach/issues"
+  },
+  "homepage": "https://github.com/khalilmansouri/redisseach#readme",
+  "devDependencies": {
+    "@types/chai": "^4.2.15",
+    "@types/mocha": "^8.2.2",
+    "@types/redis": "^2.8.28",
+    "chai": "^4.3.4",
+    "codecov": "^3.8.1",
+    "mocha": "^8.3.2",
+    "nyc": "^15.1.0",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.2"
+  },
+  "dependencies": {
+    "redis": "^3.1.0"
+  }
+}
