@@ -1,6 +1,6 @@
 # Redissearch
 
-ts client library for [redissearch](https://oss.redislabs.com/redisearch/)
+ts client library for [redisearch](https://oss.redislabs.com/redisearch/)
 
 Still under dev ..
 
