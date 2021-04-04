@@ -5,10 +5,19 @@ import Redissearch from "./index"
 
 
 describe("Redis connection", () => {
-  it("Ping redis", async () => {
+
+  it("Redis ping", async () => {
     const rs = new Redissearch({ port: 6379 })
     const pong = await rs.sendCommand("ping")
     expect(pong).to.equal("PONG")
-    // const ok = await rs.sendCommand("FT.CREATE", ["myIdx", "ON", "HASH", "PREFIX", 1, "doc:", "SCHEMA", "title", "TEXT", "WEIGHT", 5.0, "body", "TEXT", "url", "TEXT"])
+  })
+
+  it("Ping Create/Drop index", async () => {
+    const index = "God"
+    const rs = new Redissearch({ port: 6379 })
+    let ok = await rs.create("God", [{ name: "name", type: "TEXT" }])
+    expect(ok).to.equal("OK")
+    ok = await rs.dropindex(index)
+    expect(ok).to.equal("OK")
   })
 })
