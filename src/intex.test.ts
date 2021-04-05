@@ -10,6 +10,7 @@ describe("Redis connection", () => {
     const rs = new Redissearch({ port: 6379 })
     const pong = await rs.sendCommand("ping")
     expect(pong).to.equal("PONG")
+    await rs.disconnect()
   })
 
   it("Create/Drop index", async () => {
@@ -19,6 +20,7 @@ describe("Redis connection", () => {
     expect(ok).to.equal("OK")
     ok = await rs.dropindex(index)
     expect(ok).to.equal("OK")
+    await rs.disconnect()
   })
 })
 
@@ -33,6 +35,7 @@ describe("Index Creation", () => {
     expect(ok).to.equal("OK")
     ok = await rs.dropindex(index)
     expect(ok).to.equal("OK")
+    await rs.disconnect()
   })
 
   it("Create index with score", async () => {
@@ -42,5 +45,6 @@ describe("Index Creation", () => {
     expect(ok).to.equal("OK")
     ok = await rs.dropindex(index)
     expect(ok).to.equal("OK")
+    await rs.disconnect()
   })
 })

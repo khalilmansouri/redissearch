@@ -18,6 +18,12 @@ class redissearch {
     })
   }
 
+  /**
+   * Disconnecting from the Redis database with the module
+   */
+  async disconnect(): Promise<void> {
+    await this.redis.quit();
+  }
 
   /**
    * Creating an index with a given spec
