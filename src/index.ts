@@ -106,6 +106,118 @@ class redissearch {
     }
   }
 
+  /**
+ * Searching the index with a textual query
+ * @param index The index
+ * @param query The query
+ * @param parameters The additional optional parameter
+ * @returns Array reply, where the first element is the total number of results, and then pairs of document id, and a nested array of field/value.
+ */
+
+  async search(index: string, query: string, parameters?: FTSearchParameters): Promise<any> {
+    try {
+      let args: string[] = [index, query];
+      if (parameters !== undefined) {
+        if (parameters.noContent === true)
+          args.push('NOCONTENT')
+        if (parameters.verbatim === true)
+          args.push('VERBARIM')
+        if (parameters.nonStopWords === true)
+          args.push('NOSTOPWORDS')
+        if (parameters.withScores === true)
+          args.push('WITHSCORES')
+        if (parameters.withPayloads === true)
+          args.push('WITHPAYLOADS')
+        if (parameters.withSortKeys === true)
+          args.push('WITHSORTKEYS')
+        if (parameters.filter !== undefined)
+          args = args.concat(['FILTER', parameters.filter.field, parameters.filter.min.toString(), parameters.filter.max.toString()])
+        if (parameters.geoFilter !== undefined)
+          args = args.concat([
+            'GEOFILTER',
+            parameters.geoFilter.field,
+            parameters.geoFilter.lon.toString(),
+            parameters.geoFilter.lat.toString(),
+            parameters.geoFilter.radius.toString(),
+            parameters.geoFilter.measurement
+          ])
+        if (parameters.inKeys !== undefined)
+          args = args.concat(['INKEYS', parameters.inKeys.num.toString(), parameters.inKeys.field])
+        if (parameters.inFields !== undefined)
+          args = args.concat(['INFIELDS', parameters.inFields.num.toString(), parameters.inFields.field])
+        if (parameters.return !== undefined)
+          args = args.concat(['RETURN', parameters.return.num.toString(), parameters.return.field])
+        if (parameters.summarize !== undefined) {
+          args.push('SUMMARIZE')
+          if (parameters.summarize.fields !== undefined) {
+            args.push('FIELDS')
+            for (const field of parameters.summarize.fields) {
+              args = args.concat([field.num.toString(), field.field]);
+            }
+          }
+          if (parameters.summarize.frags !== undefined)
+            args = args.concat(['FRAGS', parameters.summarize.frags.toString()])
+          if (parameters.summarize.len !== undefined)
+            args = args.concat(['LEN', parameters.summarize.len.toString()])
+          if (parameters.summarize.seperator !== undefined)
+            args = args.concat(['SEPARATOR', parameters.summarize.seperator])
+        }
+        if (parameters.highlight !== undefined) {
+          args.push('HIGHLIGHT')
+          if (parameters.highlight.fields !== undefined) {
+            args.push('FIELDS')
+            for (const field of parameters.highlight.fields) {
+              args = args.concat([field.num.toString(), field.field]);
+            }
+          }
+          if (parameters.highlight.tags !== undefined) {
+            args.push('TAGS')
+            for (const tag of parameters.highlight.tags) {
+              args = args.concat([tag.open, tag.close]);
+            }
+          }
+        }
+        if (parameters.slop !== undefined)
+          args = args.concat(['SLOP', parameters.slop.toString()])
+        if (parameters.inOrder !== undefined)
+          args.push('INORDER')
+        if (parameters.language !== undefined)
+          args = args.concat(['LANGUAGE', parameters.language])
+        if (parameters.expander !== undefined)
+          args = args.concat(['EXPANDER', parameters.expander])
+        if (parameters.scorer !== undefined)
+          args = args.concat(['SCORER', parameters.scorer])
+        if (parameters.explainScore !== undefined)
+          args.push('EXPLAINSCORE')
+        if (parameters.payload)
+          args = args.concat(['PAYLOAD', parameters.payload])
+        if (parameters.sortBy !== undefined)
+          args = args.concat(['SORTBY', parameters.sortBy.field, parameters.sortBy.sort])
+        if (parameters.limit !== undefined)
+          args = args.concat(['LIMIT', parameters.limit.first.toString(), parameters.limit.num.toString()])
+      }
+      let reply = await this.sendCommand('FT.SEARCH', args);
+      return reply
+
+    }
+    catch (err) {
+      return err;
+    }
+  }
+
+  /**
+   * Insersting document in spefic insdex
+   * @param index The index
+   * @return 'OK'
+   */
+
+  async insert(index: string, doc: any): Promise<any> {
+    //> FT.CREATE shakespeare SCHEMA line TEXT SORTABLE play TEXT NOSTEM speech NUMERIC SORTABLE speaker TEXT NOSTEM entry TEXT location GEO
+    //> FT.ADD shakespeare 57956 1 FIELDS text_entry "Out, damned spot! out, I say!--One: two: why," line "5.1.31" play macbeth speech 15  speaker "LADY MACBETH" location -3.9264,57.5243
+    let args = [index]
+    Object.keys(doc).forEach(key => args = args.concat([key, doc[key]]))
+    return await this.sendCommand("HSET", args)
+  }
 
 }
 

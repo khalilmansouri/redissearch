@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import redissearch from "./index";
 // const async = require('async')
 // const should = require('chai').should()
 import Redissearch from "./index"
@@ -46,5 +47,36 @@ describe("Index Creation", () => {
     ok = await rs.dropindex(index)
     expect(ok).to.equal("OK")
     await rs.disconnect()
+  })
+})
+
+
+describe("Search", async () => {
+
+  let rs: redissearch
+  let index = "books"
+
+  before(async () => {
+    rs = new Redissearch({ port: 6379 })
+  })
+
+  after(async () => {
+    rs.dropindex(index)
+    await rs.disconnect();
+  })
+
+
+  it("Search", async () => {
+    await rs.create(index, [{ name: "title", type: "TEXT" }, { name: "summary", type: "TEXT" }], { score: "0.1", scoreField: "holyBook" })
+    await rs.insert(index, { title: "dune", summary: "People strugling in the desert" })
+    await rs.insert(index, { title: "jungle", summary: "In the jungle we strugle" })
+    await rs.insert(index, { title: "GoT", summary: "you know nothing john snow" })
+    await rs.insert(index, { title: "Bible", summary: "Jessus wanna be God" })
+    // console.log(await rs.sendCommand("keys", ["*"]))
+    // let ret = await rs.search(index, "Je", )
+    // console.log(ret)
+    // console.log(await rs.sendCommand("HGETALL", ["books"]))
+    // console.log(await rs.sendCommand("get", ["k"]))
+    expect(1).to.equal(1)
   })
 })
