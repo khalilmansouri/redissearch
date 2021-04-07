@@ -208,13 +208,13 @@ class redissearch {
   /**
    * Insersting document in spefic insdex
    * @param index The index
+   * @param id The document unique ID, 
    * @return 'OK'
    */
 
-  async insert(index: string, doc: any): Promise<any> {
-    //> FT.CREATE shakespeare SCHEMA line TEXT SORTABLE play TEXT NOSTEM speech NUMERIC SORTABLE speaker TEXT NOSTEM entry TEXT location GEO
-    //> FT.ADD shakespeare 57956 1 FIELDS text_entry "Out, damned spot! out, I say!--One: two: why," line "5.1.31" play macbeth speech 15  speaker "LADY MACBETH" location -3.9264,57.5243
-    let args = [index]
+  async insert(index: string, id: string | number, doc: any): Promise<any> {
+    let hash = index + "#" + id
+    let args: any[] = [hash]
     Object.keys(doc).forEach(key => args = args.concat([key, doc[key]]))
     return await this.sendCommand("HSET", args)
   }
