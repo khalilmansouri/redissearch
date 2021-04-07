@@ -5,7 +5,7 @@ import redissearch from "./index";
 import Redissearch from "./index"
 
 
-describe("Redis connection", () => {
+describe("Redis Connection", () => {
 
   it("Ping redis", async () => {
     const rs = new Redissearch({ port: 6379 })
@@ -79,8 +79,6 @@ describe("Search", async () => {
 
   it("Search", async () => {
     await rs.create(index, [{ name: "title", type: "TEXT" }, { name: "summary", type: "TEXT" }], { score: "0.1", scoreField: "summary" })
-    await rs.insert(index, "dune", { title: "dune", summary: "People strugling in the desert" })
-    await rs.insert(index, "jungle", { title: "jungle", summary: "In the jungle we strugle" })
     await rs.insert(index, "GoT", { title: "GoT", summary: "you know nothing john snow" })
     await rs.insert(index, "LoR", { title: "LoR", summary: "I use to know you" })
     await rs.insert(index, "martix", { title: "martix", summary: "I use to Knowledge you" })
