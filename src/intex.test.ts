@@ -70,10 +70,10 @@ describe("Search", async () => {
     await rs.insert(index, "dune", { title: "dune", summary: "People strugling in the desert" })
     await rs.insert(index, "jungle", { title: "jungle", summary: "In the jungle we strugle" })
 
-    let indexType = await rs.sendCommand("type", ["noval#dune"])
+    let indexType = await rs.sendCommand("type", ["books#dune"])
     expect(indexType).to.equal("hash")
 
-    let title = await rs.sendCommand("hget", ["noval#dune", "title"])
+    let title = await rs.sendCommand("hget", ["books#dune", "title"])
     expect(title).to.equal("dune")
   })
 
@@ -81,7 +81,7 @@ describe("Search", async () => {
     await rs.create(index, [{ name: "title", type: "TEXT" }, { name: "summary", type: "TEXT" }], { score: "0.1", scoreField: "summary" })
     await rs.insert(index, "GoT", { title: "GoT", summary: "you know nothing john snow" })
     await rs.insert(index, "LoR", { title: "LoR", summary: "I use to know you" })
-    await rs.insert(index, "martix", { title: "martix", summary: "I use to Knowledge you" })
+    await rs.insert(index, "martix", { title: "martix", summary: "You will get some Knowledge you" })
     await rs.insert(index, "Bible", { title: "Bible", summary: "Jessus wanna be God" })
     let ret = await rs.search(index, "@summary:know", { noContent: false })
     expect(ret[0]).to.equal(2)
