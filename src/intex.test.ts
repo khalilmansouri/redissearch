@@ -5,7 +5,7 @@ import redissearch from "./index";
 import Redissearch from "./index"
 
 
-describe("Redis connection", () => {
+describe("Redis Connection", () => {
 
   it("Ping redis", async () => {
     const rs = new Redissearch({ port: 6379 })
@@ -15,9 +15,9 @@ describe("Redis connection", () => {
   })
 
   it("Create/Drop index", async () => {
-    const index = "author"
+    const index = "article"
     const rs = new Redissearch({ port: 6379 })
-    let ok = await rs.create("author", [{ name: "name", type: "TEXT" }])
+    let ok = await rs.create(index, [{ name: "name", type: "TEXT" }])
     expect(ok).to.equal("OK")
     ok = await rs.dropindex(index)
     expect(ok).to.equal("OK")
@@ -26,27 +26,27 @@ describe("Redis connection", () => {
 })
 
 
-
 describe("Index Creation", () => {
+  let rs: redissearch
+  let index = 'author'
+  beforeEach(async () => {
+    rs = new Redissearch({ port: 6379 })
+  })
+
+  afterEach(async () => {
+    await rs.dropindex(index)
+    await rs.disconnect();
+  })
 
   it("Create index with default args", async () => {
-    const index = "author"
-    const rs = new Redissearch({ port: 6379 })
-    let ok = await rs.create("author", [{ name: "name", type: "TEXT" }, { name: "book", type: "TEXT" }])
+    let ok = await rs.create(index, [{ name: "name", type: "TEXT" }, { name: "book", type: "TEXT" }])
     expect(ok).to.equal("OK")
-    ok = await rs.dropindex(index)
-    expect(ok).to.equal("OK")
-    await rs.disconnect()
   })
 
   it("Create index with score", async () => {
-    const index = "author"
-    const rs = new Redissearch({ port: 6379 })
-    let ok = await rs.create("author", [{ name: "name", type: "TEXT" }, { name: "book", type: "TEXT" }], { score: "0.1", scoreField: "holyBook" })
+    let ok = await rs.create(index, [{ name: "name", type: "TEXT" }, { name: "book", type: "TEXT" }], { score: "0.1", scoreField: "holyBook" })
     expect(ok).to.equal("OK")
-    ok = await rs.dropindex(index)
-    expect(ok).to.equal("OK")
-    await rs.disconnect()
+
   })
 })
 
@@ -56,27 +56,36 @@ describe("Search", async () => {
   let rs: redissearch
   let index = "books"
 
-  before(async () => {
+  beforeEach(async () => {
     rs = new Redissearch({ port: 6379 })
   })
 
-  after(async () => {
-    rs.dropindex(index)
+  afterEach(async () => {
+    await rs.dropindex(index)
     await rs.disconnect();
   })
 
+  it("Insertion", async () => {
+    await rs.create(index, [{ name: "title", type: "TEXT" }, { name: "summary", type: "TEXT" }], { score: "0.1", scoreField: "summary" })
+    await rs.insert(index, "dune", { title: "dune", summary: "People strugling in the desert" })
+    await rs.insert(index, "jungle", { title: "jungle", summary: "In the jungle we strugle" })
+
+    let indexType = await rs.sendCommand("type", ["books#dune"])
+    expect(indexType).to.equal("hash")
+
+    let title = await rs.sendCommand("hget", ["books#dune", "title"])
+    expect(title).to.equal("dune")
+  })
 
   it("Search", async () => {
-    await rs.create(index, [{ name: "title", type: "TEXT" }, { name: "summary", type: "TEXT" }], { score: "0.1", scoreField: "holyBook" })
-    await rs.insert(index, { title: "dune", summary: "People strugling in the desert" })
-    await rs.insert(index, { title: "jungle", summary: "In the jungle we strugle" })
-    await rs.insert(index, { title: "GoT", summary: "you know nothing john snow" })
-    await rs.insert(index, { title: "Bible", summary: "Jessus wanna be God" })
-    // console.log(await rs.sendCommand("keys", ["*"]))
-    // let ret = await rs.search(index, "Je", )
-    // console.log(ret)
-    // console.log(await rs.sendCommand("HGETALL", ["books"]))
-    // console.log(await rs.sendCommand("get", ["k"]))
-    expect(1).to.equal(1)
+    await rs.create(index, [{ name: "title", type: "TEXT" }, { name: "summary", type: "TEXT" }], { score: "0.1", scoreField: "summary" })
+    await rs.insert(index, "GoT", { title: "GoT", summary: "you know nothing john snow" })
+    await rs.insert(index, "LoR", { title: "LoR", summary: "I use to know you" })
+    await rs.insert(index, "martix", { title: "martix", summary: "You will get some Knowledge you" })
+    await rs.insert(index, "Bible", { title: "Bible", summary: "Jessus wanna be God" })
+    let ret = await rs.search(index, "@summary:know", { noContent: false })
+    expect(ret[0]).to.equal(2)
+    expect(ret[1]).to.equal("books#LoR")
+    expect(ret[2]).deep.equal(['title', 'LoR'])
   })
 })
