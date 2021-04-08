@@ -206,7 +206,7 @@ class redissearch {
   }
 
   /**
-   * Insersting document in spefic insdex
+   * Insersting document in spefic index
    * @param index The index
    * @param id The document unique ID, 
    * @return 'OK'
