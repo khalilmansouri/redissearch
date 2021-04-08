@@ -1,10 +1,41 @@
 # Redissearch
 
-ts client library for [redisearch](https://oss.redislabs.com/redisearch/)
+TS client library for [redisearch](https://oss.redislabs.com/redisearch/)
 
-Still under dev ..
+# usage
+
+## Index creation
 
 
+``` typescript
+// The following example creates "users" index with firstName, lastName and email schema  
+import Redissearch from "Redissearch"
+const PORT = process.env.PORT
+const rs = new Redissearch({port: PORT})
+const index = "users"
+async ()=>{
+  await rs.create(
+    index, [
+      { firstName: "name", type: "TEXT" },
+      { lastName: "email", type: "TEXT" }, 
+      { email: "name", type: "TEXT" }])
+}()
+```
+## Insertion 
+
+``` typescript
+const user = {
+  email: "johndoe@email.com",
+  firstName: "John",
+  lastName: "Doe"
+}
+await rs.insert(index, email, user )
+
+```
+## Search
+...
+## Index droping
+...
 
 ### Contributing
 - Fork this Repo first
