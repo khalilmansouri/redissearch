@@ -2,6 +2,8 @@
 
 TS client library for [redisearch](https://oss.redislabs.com/redisearch/)
 
+# install
+
 # usage
 
 ## Index creation
@@ -24,6 +26,7 @@ async ()=>{
 ## Insertion 
 
 ``` typescript
+// The following example insert a doc to index "users"  
 const user = {
   email: "johndoe@email.com",
   firstName: "John",
