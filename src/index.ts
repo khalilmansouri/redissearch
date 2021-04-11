@@ -219,6 +219,22 @@ class redissearch {
     return await this.sendCommand("HSET", args)
   }
 
+  /**
+   * Retrieving infromation and statistics on the index
+   * @param index The index
+   * @returns A nested array of keys and values. 
+   */
+  async info(index: string): Promise<FTInfo> {
+    try {
+      // let info = await this.sendCommand('FT.INFO', [index]);
+      // return info as FTInfo
+      return await this.sendCommand('FT.INFO', [index]) as FTInfo;
+    }
+    catch (error) {
+      return error;
+    }
+  }
+
 }
 
 /**
