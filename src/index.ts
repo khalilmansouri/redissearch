@@ -226,9 +226,13 @@ class redissearch {
    */
   async info(index: string): Promise<FTInfo> {
     try {
-      // let info = await this.sendCommand('FT.INFO', [index]);
-      // return info as FTInfo
-      return await this.sendCommand('FT.INFO', [index]) as FTInfo;
+      let info: { [key: string]: any } = {}
+      let nativeInfo = []
+      nativeInfo = await this.sendCommand('FT.INFO', [index]) as any[];
+      for (let i = 0; i < nativeInfo.length; i += 2) {
+        info[nativeInfo[i]] = nativeInfo[i + 1]
+      }
+      return info as FTInfo
     }
     catch (error) {
       return error;
