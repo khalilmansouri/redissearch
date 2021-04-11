@@ -89,3 +89,25 @@ describe("Search", async () => {
     expect(ret[2]).deep.equal(['title', 'LoR'])
   })
 })
+
+describe("Info", () => {
+  let rs: redissearch
+  let index = "books"
+
+  beforeEach(async () => {
+    rs = new Redissearch({ port: 6379 })
+  })
+
+  afterEach(async () => {
+    await rs.dropindex(index)
+    await rs.disconnect();
+  })
+
+  it("Info", async () => {
+    await rs.create(index, [{ name: "title", type: "TEXT" }, { name: "summary", type: "TEXT" }], { score: "0.1", scoreField: "summary" })
+    await rs.insert(index, "GoT", { title: "GoT", summary: "you know nothing john snow" })
+    await rs.insert(index, "LoR", { title: "LoR", summary: "I use to know you" })
+    let info = await rs.info("books")
+    expect(info.index_name).to.equal("books")
+  })
+})

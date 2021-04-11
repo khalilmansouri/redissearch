@@ -219,6 +219,26 @@ class redissearch {
     return await this.sendCommand("HSET", args)
   }
 
+  /**
+   * Retrieving infromation and statistics on the index
+   * @param index The index
+   * @returns A nested array of keys and values. 
+   */
+  async info(index: string): Promise<FTInfo> {
+    try {
+      let info: { [key: string]: any } = {}
+      let nativeInfo = []
+      nativeInfo = await this.sendCommand('FT.INFO', [index]) as any[];
+      for (let i = 0; i < nativeInfo.length; i += 2) {
+        info[nativeInfo[i]] = nativeInfo[i + 1]
+      }
+      return info as FTInfo
+    }
+    catch (error) {
+      return error;
+    }
+  }
+
 }
 
 /**
